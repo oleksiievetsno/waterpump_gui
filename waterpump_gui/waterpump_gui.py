@@ -193,12 +193,19 @@ class WaterPumpGUI:
             return None
         with self.serial_lock:
             try:
+                self.ser.reset_input_buffer()
                 self.ser.write((cmd + "\r").encode())
-                time.sleep(0.3)
+                # wait up to 1s for data to arrive
+                deadline = time.time() + 1.0
+                while self.ser.in_waiting == 0 and time.time() < deadline:
+                    time.sleep(0.05)
+                time.sleep(0.1)  # let the full response land
                 resp = self.ser.read_all().decode(errors="ignore").strip()
                 self._log(f">>> {cmd}")
                 if resp:
                     self._log(f"    {resp}")
+                else:
+                    self._log(f"    (no response)")
                 return resp
             except Exception as e:
                 self._log(f"ERROR: {e}")
