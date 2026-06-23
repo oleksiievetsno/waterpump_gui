@@ -6,3 +6,9 @@ dist/
 build/
 *.spec
 *.csv
+# microscopy data
+*.tiff
+*.tif
+*.nd2
+*.zarr/
+acquisitions/
